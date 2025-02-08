@@ -1,0 +1,18 @@
+# Ignora o ambiente virtual
+.venv/
+
+# Ignora a sessão de login salva pelo bot
+session/
+
+# Ignora o arquivo de variáveis de ambiente
+.env
+
+# Ignora cache do Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignora arquivos de sistema
+.DS_Store
+Thumbs.db
