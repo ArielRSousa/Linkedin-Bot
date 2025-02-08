@@ -1,9 +1,9 @@
 import undetected_chromedriver as uc
-from selenium.webdriver.common.by import By
 import time
 import os
-from dotenv import load_dotenv
 import pyfiglet
+from selenium.webdriver.common.by import By
+from dotenv import load_dotenv
 from colorama import Fore, Style, init
 
 init(autoreset=True)
@@ -78,7 +78,7 @@ class LinkedinBot:
                         time.sleep(2)
 
                 except Exception as e:
-                    print(Fore.RED + f"Erro ao enviar pedido: {e}")
+                    print(Fore.RED + f"Erro ao enviar pedido")
 
             try:
                 botao_proximo = self.driver.find_element(By.XPATH, "//button[@aria-label='Avançar']")
