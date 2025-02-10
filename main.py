@@ -45,17 +45,29 @@ class LinkedinBot:
             print(Fore.RED + "Erro no login. Verifique suas credenciais.")
 
     def pesquisar_pessoas(self, termo_busca):
+        self.termo_busca = termo_busca
         print(Fore.CYAN + f"Pesquisando: {termo_busca}")
         self.driver.get(f"https://www.linkedin.com/search/results/people/?keywords={termo_busca}")
         time.sleep(5)
 
-    def enviar_pedidos_conexao(self, mensagem):
+
+    def enviar_pedidos_conexao(self, mensagem, max_pages=10):
         print(Fore.YELLOW + "Enviando pedidos de conexão...")
         conexoes_enviadas = 0
+        pagina_atual = 1
 
-        while True:
+        while pagina_atual <= max_pages:
+            print(Fore.CYAN + f"Visitando página {pagina_atual}")
+            self.driver.get(f"https://www.linkedin.com/search/results/people/?keywords={self.termo_busca}&page={pagina_atual}")
+            time.sleep(5)
+
             botoes_conectar = self.driver.find_elements(By.XPATH, "//button[contains(@aria-label, 'se conectar')]")
-            print(f"Total de botões de conectar: {len(botoes_conectar)}")
+            print(f"Total de botões de conectar na página {pagina_atual}: {len(botoes_conectar)}")
+
+            if not botoes_conectar:
+                print(Fore.YELLOW + "Nenhum botão de conectar encontrado nesta página. Indo para a próxima.")
+                pagina_atual += 1
+                continue
 
             for botao in botoes_conectar:
                 try:
@@ -78,17 +90,12 @@ class LinkedinBot:
                         time.sleep(2)
 
                 except Exception as e:
-                    print(Fore.RED + f"Erro ao enviar pedido")
+                    print(Fore.RED + f"Erro ao enviar pedido: {e}")
 
-            try:
-                botao_proximo = self.driver.find_element(By.XPATH, "//button[@aria-label='Avançar']")
-                botao_proximo.click()
-                time.sleep(5)
-            except:
-                print(Fore.YELLOW + "Nenhuma próxima página encontrada.")
-                break
+            pagina_atual += 1
 
         print(Fore.CYAN + f"Total de conexões enviadas: {conexoes_enviadas}")
+
 
     def fechar(self):
         self.driver.quit()
@@ -121,8 +128,10 @@ def main():
 
             termo_busca = input(Fore.CYAN + "Digite o termo de busca (ex.: Desenvolvedor de Software): ")
             mensagem_personalizada = input(Fore.CYAN + "Digite a mensagem personalizada: ")
+            max_pages = int(input(Fore.CYAN + "Digite o número máximo de páginas para visitar: "))
             bot.pesquisar_pessoas(termo_busca)
-            bot.enviar_pedidos_conexao(mensagem_personalizada)
+            bot.enviar_pedidos_conexao(mensagem_personalizada, max_pages)
+
         elif opcao == "3":
             print(Fore.GREEN + "Encerrando o bot. Até a próxima!")
             bot.fechar()
