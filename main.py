@@ -141,4 +141,7 @@ def main():
             print(Fore.RED + "Opção inválida. Tente novamente.\n")
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print(Fore.RED + "\nBot interrompido pelo usuário. Até a próxima!")
