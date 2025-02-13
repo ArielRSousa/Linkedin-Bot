@@ -103,6 +103,7 @@ class LinkedinBot:
 def mostrar_menu():
     titulo = pyfiglet.figlet_format("Linkedin Bot")
     print(Fore.BLUE + titulo)
+    print(Style.BRIGHT + Fore.YELLOW + "Criado por: @ArielRSousa\n")
     print(Style.BRIGHT + Fore.YELLOW + "Automatize suas conexões no LinkedIn rapidamente.\n")
     print(Fore.CYAN + "Escolha uma opção:")
     print("1. Login no LinkedIn")
