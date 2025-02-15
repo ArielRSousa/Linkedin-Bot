@@ -100,6 +100,22 @@ class LinkedinBot:
     def fechar(self):
         self.driver.quit()
 
+def detectar_limite_semanal(self):
+    print(Fore.YELLOW + "Verificando limite semanal de convites...")
+    self.driver.get("https://www.linkedin.com/mynetwork/invitation-manager/sent/")
+    time.sleep(5)
+
+    try:
+        limite_semanal = self.driver.find_element(By.XPATH, "//h1[contains(text(), 'Você atingiu o limite de convites semanais')]")
+        if limite_semanal.is_displayed():
+            print(Fore.RED + "Você atingiu o limite semanal de convites.")
+            return True
+    except:
+        print(Fore.GREEN + "Você ainda não atingiu o limite de convites semanais.")
+    
+    return False
+
+
 def mostrar_menu():
     titulo = pyfiglet.figlet_format("Linkedin Bot")
     print(Fore.BLUE + titulo)
@@ -109,6 +125,11 @@ def mostrar_menu():
     print("1. Login no LinkedIn")
     print("2. Pesquisar e enviar pedidos de conexão")
     print("3. Sair\n")
+
+def main():
+    username = os.getenv("LINKEDIN_USERNAME")
+    password = os.getenv("LINKEDIN_PASSWORD")
+    bot = LinkedinBot(username, password)
 
 def main():
     username = os.getenv("LINKEDIN_USERNAME")
@@ -125,6 +146,10 @@ def main():
         elif opcao == "2":
             if not bot.verificar_login():
                 print(Fore.RED + "Você precisa fazer login antes de continuar.")
+                continue
+
+            if bot.detectar_limite_semanal():
+                print(Fore.RED + "Você atingiu o limite semanal de convites. Aguarde até a próxima semana.")
                 continue
 
             termo_busca = input(Fore.CYAN + "Digite o termo de busca (ex.: Desenvolvedor de Software): ")
