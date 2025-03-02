@@ -7,6 +7,13 @@ from dotenv import load_dotenv
 from colorama import Fore, Style, init
 
 init(autoreset=True)
+
+if not os.path.exists(".env"):
+    with open(".env", "w") as f:
+        f.write("LINKEDIN_USERNAME=\n")
+        f.write("LINKEDIN_PASSWORD=\n")
+    print(Fore.YELLOW + "Arquivo .env criado. Preencha com suas credenciais do LinkedIn.")
+
 load_dotenv()
 
 class LinkedinBot:
