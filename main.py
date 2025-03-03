@@ -3,6 +3,7 @@ import time
 import os
 import pyfiglet
 from selenium.webdriver.common.by import By
+from selenium.common.exceptions import NoSuchElementException
 from dotenv import load_dotenv
 from colorama import Fore, Style, init
 
@@ -24,34 +25,50 @@ class LinkedinBot:
         self.driver = self.iniciar_driver()
 
     def iniciar_driver(self):
-        options = uc.ChromeOptions()
-        options.add_argument("--start-maximized")
-        options.add_argument("--user-data-dir=./session")
-        return uc.Chrome(options=options)
+        try:
+            options = uc.ChromeOptions()
+            options.add_argument("--start-maximized")
+            options.add_argument("--user-data-dir=./session")
+            return uc.Chrome(options=options)
+        except Exception as e:
+            print(Fore.RED + f"Erro ao iniciar o driver: {e}")
+            exit(1)
 
     def verificar_login(self):
-        self.driver.get("https://www.linkedin.com/feed")
-        time.sleep(5)
-        return "session_redirect" not in self.driver.current_url
+        try:
+            self.driver.get("https://www.linkedin.com/feed")
+            time.sleep(5)
+            return "session_redirect" not in self.driver.current_url
+        except Exception as e:
+            print(Fore.RED + f"Erro ao verificar login: {e}")
+            return False
 
     def fazer_login(self):
-        self.driver.get("https://www.linkedin.com/login")
-        time.sleep(2)
-        self.driver.find_element(By.ID, "username").send_keys(self.username)
-        self.driver.find_element(By.ID, "password").send_keys(self.password)
-        self.driver.find_element(By.XPATH, "//button[@type='submit']").click()
-        time.sleep(5)
+        try:
+            self.driver.get("https://www.linkedin.com/login")
+            time.sleep(2)
+            self.driver.find_element(By.ID, "username").send_keys(self.username)
+            self.driver.find_element(By.ID, "password").send_keys(self.password)
+            self.driver.find_element(By.XPATH, "//button[@type='submit']").click()
+            time.sleep(5)
+        except NoSuchElementException:
+            print(Fore.RED + "Erro: Elementos de login não encontrados.")
+        except Exception as e:
+            print(Fore.RED + f"Erro ao fazer login: {e}")
 
     def pesquisar_pessoas(self, termo_busca, localizacao=None):
         self.termo_busca = termo_busca
-        self.localizacao = localizacao
+        self.localizacao = localizacao if localizacao else ""
         print(Fore.CYAN + f"Pesquisando: {termo_busca} em {localizacao if localizacao else 'qualquer lugar'}")
         url = f"https://www.linkedin.com/search/results/people/?keywords={termo_busca.replace(' ', '%20')}"
         if localizacao:
             url += f"%20em%20{localizacao.replace(' ', '%20')}"
         print(Fore.YELLOW + f"URL gerada: {url}")
-        self.driver.get(url)
-        time.sleep(5)
+        try:
+            self.driver.get(url)
+            time.sleep(5)
+        except Exception as e:
+            print(Fore.RED + f"Erro ao carregar página de pesquisa: {e}")
 
     def enviar_pedidos_conexao(self, mensagem, max_pages=10):
         print(Fore.YELLOW + "Enviando pedidos de conexão...")
@@ -61,8 +78,13 @@ class LinkedinBot:
         while pagina_atual <= max_pages:
             print(Fore.CYAN + f"Visitando página {pagina_atual}")
             url = f"https://www.linkedin.com/search/results/people/?keywords={self.termo_busca.replace(' ', '%20')}%20em%20{self.localizacao.replace(' ', '%20')}&page={pagina_atual}"
-            self.driver.get(url)
-            time.sleep(5)
+            try:
+                self.driver.get(url)
+                time.sleep(5)
+            except Exception as e:
+                print(Fore.RED + f"Erro ao carregar página {pagina_atual}: {e}")
+                break
+
             botoes_conectar = self.driver.find_elements(By.XPATH, "//button[contains(@aria-label, 'se conectar')]")
             print(f"Total de botões de conectar na página {pagina_atual}: {len(botoes_conectar)}")
             if not botoes_conectar:
@@ -73,7 +95,7 @@ class LinkedinBot:
                 try:
                     botao.click()
                     time.sleep(2)
-                    if self.conter_nota:
+                    if self.conter_nota and mensagem:
                         adicionar_nota = self.driver.find_element(By.XPATH, "//button[contains(text(), 'Adicionar nota')]")
                         adicionar_nota.click()
                         campo_mensagem = self.driver.find_element(By.XPATH, "//textarea[@name='message']")
@@ -119,11 +141,11 @@ def main():
                 print(Fore.RED + "Você precisa fazer login antes de continuar.")
                 continue
             termo_busca = input(Fore.CYAN + "Digite o termo de busca (ex.: Desenvolvedor de Software): ")
-            localizacao = input(Fore.CYAN + "Digite a localização desejada (ex.: São Paulo, Brasil): ")
-            mensagem_personalizada = input(Fore.CYAN + "Digite a mensagem personalizada: ")
+            localizacao = input(Fore.CYAN + "Digite a localização desejada (ex.: São Paulo, Brasil) ou pressione Enter para ignorar: ")
+            mensagem_personalizada = input(Fore.CYAN + "Digite a mensagem personalizada ou pressione Enter para ignorar: ")
             max_pages = int(input(Fore.CYAN + "Digite o número máximo de páginas para visitar: "))
-            bot.pesquisar_pessoas(termo_busca, localizacao)
-            bot.enviar_pedidos_conexao(mensagem_personalizada, max_pages)
+            bot.pesquisar_pessoas(termo_busca, localizacao if localizacao else None)
+            bot.enviar_pedidos_conexao(mensagem_personalizada if mensagem_personalizada else None, max_pages)
         elif opcao == "3":
             print(Fore.GREEN + "Encerrando o bot. Até a próxima!")
             bot.fechar()
