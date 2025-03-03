@@ -44,10 +44,11 @@ class LinkedinBot:
 
     def pesquisar_pessoas(self, termo_busca, localizacao=None):
         self.termo_busca = termo_busca
+        self.localizacao = localizacao
         print(Fore.CYAN + f"Pesquisando: {termo_busca} em {localizacao if localizacao else 'qualquer lugar'}")
-        url = f"https://www.linkedin.com/search/results/people/?keywords={termo_busca}"
+        url = f"https://www.linkedin.com/search/results/people/?keywords={termo_busca.replace(' ', '%20')}"
         if localizacao:
-            url += f"+em+{localizacao}"
+            url += f"%20em%20{localizacao.replace(' ', '%20')}"
         print(Fore.YELLOW + f"URL gerada: {url}")
         self.driver.get(url)
         time.sleep(5)
@@ -59,7 +60,8 @@ class LinkedinBot:
 
         while pagina_atual <= max_pages:
             print(Fore.CYAN + f"Visitando página {pagina_atual}")
-            self.driver.get(f"https://www.linkedin.com/search/results/people/?keywords={self.termo_busca}&page={pagina_atual}")
+            url = f"https://www.linkedin.com/search/results/people/?keywords={self.termo_busca.replace(' ', '%20')}%20em%20{self.localizacao.replace(' ', '%20')}&page={pagina_atual}"
+            self.driver.get(url)
             time.sleep(5)
             botoes_conectar = self.driver.find_elements(By.XPATH, "//button[contains(@aria-label, 'se conectar')]")
             print(f"Total de botões de conectar na página {pagina_atual}: {len(botoes_conectar)}")
