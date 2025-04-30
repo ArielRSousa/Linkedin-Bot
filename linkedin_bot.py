@@ -34,7 +34,24 @@ class LinkedinBot:
             options.add_argument("--user-data-dir=./session")
             return uc.Chrome(options=options)
         except Exception as e:
-            print(Fore.RED + f"Erro ao iniciar o driver: {e}")
+            error_msg = str(e)
+            if "session not created" in error_msg.lower() and "chrome version" in error_msg.lower():
+                print(Fore.RED + "\n" + "="*80)
+                print(Fore.RED + "ERRO: INCOMPATIBILIDADE DE VERSÃO")
+                print(Fore.RED + "="*80)
+                print(Fore.YELLOW + "\nDetalhes do problema:")
+                print(Fore.CYAN + f"• Sua versão do Chrome: {error_msg.split('Current browser version is ')[1].split('\n')[0]}")
+                print(Fore.CYAN + f"• Versão do ChromeDriver necessária: {error_msg.split('ChromeDriver only supports Chrome version ')[1].split('\n')[0]}")
+                print(Fore.YELLOW + "\nComo resolver:")
+                print(Fore.CYAN + "1. Acesse: https://chromedriver.chromium.org/downloads")
+                print(Fore.CYAN + "2. Baixe o ChromeDriver versão " + error_msg.split("ChromeDriver only supports Chrome version ")[1].split("\n")[0])
+                print(Fore.CYAN + "   - Para Windows: escolha 'chromedriver_win32.zip'")
+                print(Fore.CYAN + "   - Para Linux: escolha 'chromedriver_linux64.zip'")
+                print(Fore.CYAN + "3. Extraia o arquivo baixado")
+                print(Fore.CYAN + "4. Copie o arquivo 'chromedriver.exe' (Windows) ou 'chromedriver' (Linux) para a pasta do projeto")
+                print(Fore.RED + "\n" + "="*80 + "\n")
+            else:
+                print(Fore.RED + f"\nErro ao iniciar o driver: {e}\n")
             exit(1)
 
     def verificar_login(self):
