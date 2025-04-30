@@ -1,8 +1,29 @@
 # Linkedin Bot - Automatizador de Conexões no LinkedIn
 
+[![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Automation-orange)](https://www.linkedin.com/)
+[![Status](https://img.shields.io/badge/Status-Active-brightgreen)](https://github.com/seuusuario/linkedin-bot)
+[![Chrome](https://img.shields.io/badge/Chrome-Required-red)](https://www.google.com/chrome/)
+
+[![LinkedIn Bot](https://img.shields.io/badge/LinkedIn%20Bot-Automation%20Tool-yellow)](https://github.com/seuusuario/linkedin-bot)
+[![Automation](https://img.shields.io/badge/Automation-Scheduled-blueviolet)](https://github.com/seuusuario/linkedin-bot)
+[![Security](https://img.shields.io/badge/Security-Safe-brightgreen)](https://github.com/seuusuario/linkedin-bot)
+
 Este projeto é um **bot de automação para o LinkedIn**, que permite realizar login, pesquisar usuários de uma área específica e enviar solicitações de conexão personalizadas **automaticamente**. Agora, conta também com um **sistema de automação programada**, que executa as conexões toda **segunda-feira** e pode ser configurado para **iniciar automaticamente com o sistema**.
 
----
+
+## 📋 Índice
+- [Requisitos](#️-requisitos)
+- [Instalação](#-instalação)
+- [Como usar](#️-como-usar)
+- [Automação e Agendamento](#-automação-e-agendamento)
+- [Funcionalidades](#-funcionalidades)
+- [Estrutura do Projeto](#-estrutura-do-projeto)
+- [Segurança](#-segurança)
+- [Contribuindo](#-contribuindo)
+- [Aviso](#️-aviso)
+- [Licença](#-licença)
 
 ## 🛠️ **Requisitos**
 
@@ -10,8 +31,6 @@ Este projeto é um **bot de automação para o LinkedIn**, que permite realizar 
 - Ambiente virtual configurado (recomendado)
 - **Google Chrome** instalado
 - **Chromedriver** gerenciado automaticamente pelo `undetected-chromedriver`
-
----
 
 ## 🔦 **Instalação**
 
@@ -35,14 +54,12 @@ Este projeto é um **bot de automação para o LinkedIn**, que permite realizar 
    pip install -r requirements.txt
    ```
 
-4. **Crie o arquivo ********************`.env`******************** com suas credenciais**:
+4. **Crie o arquivo `.env` com suas credenciais**:
 
    ```plaintext
    LINKEDIN_USERNAME=seu_email@exemplo.com
    LINKEDIN_PASSWORD=sua_senha_segura
    ```
-
----
 
 ## 🕹️ **Como usar**
 
@@ -60,15 +77,11 @@ Este projeto é um **bot de automação para o LinkedIn**, que permite realizar 
    - **4**: **Iniciar manualmente** (Executa a automação imediatamente)
    - **5**: **Sair**
 
----
-
 ## ⏰ **Automação e Agendamento**
 
 Agora, o bot pode **rodar automaticamente toda segunda-feira** para evitar bloqueios do LinkedIn devido ao limite semanal de conexões. O agendamento pode ser ativado ou desativado pelo próprio menu.
 
 Caso o sistema seja desligado e religado, a automação **ainda será executada na próxima segunda-feira**.
-
----
 
 ## 🌟 **Funcionalidades**
 
@@ -78,8 +91,6 @@ Caso o sistema seja desligado e religado, a automação **ainda será executada 
 ✅ **Execução programada toda segunda-feira** para evitar bloqueios\
 ✅ **Possibilidade de alterar os parâmetros de automação pelo menu**\
 ✅ **Opção de iniciar automaticamente com o sistema**
-
----
 
 ## 📂 **Estrutura do Projeto**
 
@@ -96,21 +107,46 @@ Caso o sistema seja desligado e religado, a automação **ainda será executada 
     └── README.md           # Documentação
 ```
 
----
-
 ## 🔒 **Segurança**
 
 - As credenciais do LinkedIn estão armazenadas no arquivo `.env`, que **não deve ser compartilhado**.
 - O projeto **não armazena** suas credenciais de forma insegura.
 - O uso excessivo do bot pode resultar em restrições da conta do LinkedIn.
 
----
+## 🤝 **Contribuindo**
+
+Contribuições são sempre bem-vindas! Se você tem alguma ideia para melhorar o projeto, sinta-se à vontade para:
+
+1. Fazer um fork do projeto
+2. Criar uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'feat: add some amazing feature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abrir um Pull Request
+
+### 📝 Padrões de Commit
+
+Este projeto segue o padrão [Conventional Commits](https://www.conventionalcommits.org/). Por favor, use os seguintes prefixos nos seus commits:
+
+- `feat:` para novas funcionalidades
+- `fix:` para correções de bugs
+- `docs:` para alterações na documentação
+- `style:` para alterações de formatação
+- `refactor:` para refatorações de código
+- `test:` para adição ou modificação de testes
+- `chore:` para atualizações de dependências ou configurações
+
+### 🐛 Reportando Bugs
+
+Se você encontrar algum bug, por favor, abra uma issue com:
+- Descrição detalhada do problema
+- Passos para reproduzir
+- Comportamento esperado
+- Screenshots (se aplicável)
+- Ambiente (sistema operacional, versão do Python, etc.)
 
 ## ⚠️ **Aviso**
 
 Este projeto foi desenvolvido **para fins educacionais**. O uso abusivo pode violar os **termos de serviço do LinkedIn**, resultando no bloqueio da sua conta. Use com responsabilidade.
-
----
 
 ## 🐜 **Licença**
 
