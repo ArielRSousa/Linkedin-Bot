@@ -11,13 +11,16 @@ from colorama import Fore, Style, init
 
 init(autoreset=True)
 
-if not os.path.exists(".env"):
-    with open(".env", "w") as f:
+ENV_PATH = os.path.join("config", ".env")
+
+if not os.path.exists(ENV_PATH):
+    os.makedirs("config", exist_ok=True)
+    with open(ENV_PATH, "w") as f:
         f.write("LINKEDIN_USERNAME=\n")
         f.write("LINKEDIN_PASSWORD=\n")
-    print(Fore.YELLOW + "Arquivo .env criado. Preencha com suas credenciais do LinkedIn.")
+    print(Fore.YELLOW + "Arquivo .env criado em config/.env. Preencha com suas credenciais do LinkedIn.")
 
-load_dotenv()
+load_dotenv(ENV_PATH)
 
 class LinkedinBot:
     def __init__(self, username, password, conter_nota=False):
