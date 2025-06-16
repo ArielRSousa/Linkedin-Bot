@@ -6,7 +6,7 @@ from datetime import datetime
 from colorama import Fore
 from .linkedin_bot import LinkedinBot
 
-CONFIG_FILE = "config.json"
+CONFIG_FILE = os.path.join("config", "config.json")
 
 class AutomationManager:
     def __init__(self):
@@ -41,6 +41,7 @@ class AutomationManager:
 
     def save_config(self, config):
         """Salva as configurações no JSON."""
+        os.makedirs("config", exist_ok=True)
         with open(CONFIG_FILE, "w") as file:
             json.dump(config, file, indent=4)
 
