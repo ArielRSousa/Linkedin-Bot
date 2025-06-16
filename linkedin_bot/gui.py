@@ -13,6 +13,8 @@ from .config_manager import AutomationManager
 from .updater import check_and_update
 from selenium.common.exceptions import WebDriverException
 
+ENV_PATH = os.path.join("config", ".env")
+
 class BotThread(QThread):
     update_signal = pyqtSignal(str)
     finished_signal = pyqtSignal()
@@ -323,7 +325,7 @@ class MainWindow(QMainWindow):
         file_menu.addAction(exit_action)
 
     def load_credentials(self):
-        load_dotenv()
+        load_dotenv(ENV_PATH)
         email = os.getenv("LINKEDIN_USERNAME")
         password = os.getenv("LINKEDIN_PASSWORD")
         auto_login = os.getenv("AUTO_LOGIN", "False")
@@ -337,7 +339,8 @@ class MainWindow(QMainWindow):
             self.handle_login(auto=True)
 
     def save_credentials(self):
-        with open(".env", "w") as f:
+        os.makedirs("config", exist_ok=True)
+        with open(ENV_PATH, "w") as f:
             f.write(f"LINKEDIN_USERNAME={self.email_input.text()}\n")
             f.write(f"LINKEDIN_PASSWORD={self.password_input.text()}\n")
             f.write(f"AUTO_LOGIN={'True' if self.auto_login_checkbox.isChecked() else 'False'}\n")
