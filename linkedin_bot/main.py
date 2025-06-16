@@ -4,10 +4,10 @@ import pyfiglet
 import threading
 from colorama import Fore, Style
 from dotenv import load_dotenv
-from config_manager import AutomationManager, agendar_bot
-from linkedin_bot import LinkedinBot
+from .config_manager import AutomationManager, agendar_bot
+from .linkedin_bot import LinkedinBot
 from PyQt6.QtWidgets import QApplication
-from gui import MainWindow
+from .gui import MainWindow
 
 def iniciar_automacao_em_thread(manager):
     """Executa a automação em uma thread separada para não bloquear o menu."""

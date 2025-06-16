@@ -4,7 +4,7 @@ import schedule
 import time
 from datetime import datetime
 from colorama import Fore
-from linkedin_bot import LinkedinBot
+from .linkedin_bot import LinkedinBot
 
 CONFIG_FILE = "config.json"
 
