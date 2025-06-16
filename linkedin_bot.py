@@ -24,130 +24,211 @@ class LinkedinBot:
         self.username = username
         self.password = password
         self.conter_nota = conter_nota
-        self.driver = self.iniciar_driver()
-        self.wait = WebDriverWait(self.driver, 10)  # Tempo de espera dinâmico
+        self.driver = None
+        self.wait = None
+        self.is_logged_in = False
+        self.iniciar_driver()
 
     def iniciar_driver(self):
         try:
+            # Só cria um novo driver se não existir
+            if self.driver:
+                return self.driver
+
             options = uc.ChromeOptions()
-            options.add_argument("--start-maximized")
-            options.add_argument("--user-data-dir=./session")
-            return uc.Chrome(options=options)
+            options.add_argument('--no-sandbox')
+            options.add_argument('--disable-dev-shm-usage')
+            options.add_argument('--disable-gpu')
+            options.add_argument('--disable-extensions')
+            options.add_argument('--disable-popup-blocking')
+            options.add_argument('--start-maximized')
+            options.add_argument('--disable-notifications')
+            # Persistência de sessão
+            profile_path = os.path.join(os.getcwd(), "chrome_profile")
+            options.add_argument(f'--user-data-dir={profile_path}')
+            
+            self.driver = uc.Chrome(options=options)
+            self.wait = WebDriverWait(self.driver, 10)
+            return self.driver
         except Exception as e:
-            error_msg = str(e)
-            if "session not created" in error_msg.lower() and "chrome version" in error_msg.lower():
-                print(Fore.RED + "\n" + "="*80)
-                print(Fore.RED + "ERRO: INCOMPATIBILIDADE DE VERSÃO")
-                print(Fore.RED + "="*80)
-                print(Fore.YELLOW + "\nDetalhes do problema:")
-                print(Fore.CYAN + f"• Sua versão do Chrome: {error_msg.split('Current browser version is ')[1].split()[0]}")
-                print(Fore.CYAN + f"• Versão do ChromeDriver necessária: {error_msg.split('ChromeDriver only supports Chrome version ')[1].split()[0]}")
-                print(Fore.YELLOW + "\nComo resolver:")
-                print(Fore.CYAN + "1. Acesse: https://chromedriver.chromium.org/downloads")
-                print(Fore.CYAN + "2. Baixe o ChromeDriver versão " + error_msg.split("ChromeDriver only supports Chrome version ")[1].split("\n")[0])
-                print(Fore.CYAN + "   - Para Windows: escolha 'chromedriver_win32.zip'")
-                print(Fore.CYAN + "   - Para Linux: escolha 'chromedriver_linux64.zip'")
-                print(Fore.CYAN + "3. Extraia o arquivo baixado")
-                print(Fore.CYAN + "4. Copie o arquivo 'chromedriver.exe' (Windows) ou 'chromedriver' (Linux) para a pasta do projeto")
-                print(Fore.RED + "\n" + "="*80 + "\n")
-            else:
-                print(Fore.RED + f"\nErro ao iniciar o driver: {e}\n")
-            exit(1)
+            print(f"Erro ao iniciar o driver: {str(e)}")
+            return None
 
     def verificar_login(self):
         try:
+            if not self.driver:
+                self.iniciar_driver()
+                if not self.driver:
+                    return False
+
             self.driver.get("https://www.linkedin.com/feed")
-            time.sleep(5)
-            return "session_redirect" not in self.driver.current_url
+            time.sleep(3)
+
+            # Se está na página de login, não está logado
+            if "login" in self.driver.current_url:
+                self.is_logged_in = False
+                return False
+
+            # Se está no feed, provavelmente está logado
+            if "/feed" in self.driver.current_url:
+                self.is_logged_in = True
+                return True
+
+            # Verificação extra: procura por elementos do menu superior
+            try:
+                self.wait.until(EC.presence_of_element_located((By.XPATH, "//header")))
+                self.is_logged_in = True
+                return True
+            except:
+                self.is_logged_in = False
+                return False
+
         except Exception as e:
-            print(Fore.RED + f"Erro ao verificar login: {e}")
+            print(f"Erro ao verificar login: {str(e)}")
+            self.is_logged_in = False
             return False
 
     def fazer_login(self):
         try:
+            if self.is_logged_in:
+                print("Já está logado!")
+                return True
+
+            if not self.driver:
+                self.iniciar_driver()
+                if not self.driver:
+                    raise Exception("Não foi possível iniciar o driver")
+
             self.driver.get("https://www.linkedin.com/login")
             time.sleep(2)
-            self.driver.find_element(By.ID, "username").send_keys(self.username)
-            self.driver.find_element(By.ID, "password").send_keys(self.password)
-            self.driver.find_element(By.XPATH, "//button[@type='submit']").click()
+            
+            # Limpar campos antes de preencher
+            username_field = self.driver.find_element(By.ID, "username")
+            password_field = self.driver.find_element(By.ID, "password")
+            
+            username_field.clear()
+            password_field.clear()
+            
+            username_field.send_keys(self.username)
+            password_field.send_keys(self.password)
+            
+            submit_button = self.driver.find_element(By.XPATH, "//button[@type='submit']")
+            submit_button.click()
             time.sleep(5)
-        except NoSuchElementException:
-            print(Fore.RED + "Erro: Elementos de login não encontrados.")
+
+            # Verifica se o login foi bem sucedido
+            if self.verificar_login():
+                self.is_logged_in = True
+                print("Login realizado com sucesso!")
+                return True
+            else:
+                print("Falha no login. Verifique suas credenciais ou se há bloqueio/captcha.")
+                return False
+
         except Exception as e:
-            print(Fore.RED + f"Erro ao fazer login: {e}")
+            print(f"Erro ao fazer login: {str(e)}")
+            self.is_logged_in = False
+            raise
 
     def pesquisar_pessoas(self, termo_busca, localizacao=None):
-        self.termo_busca = termo_busca
-        self.localizacao = localizacao if localizacao else ""
-        print(Fore.CYAN + f"Pesquisando: {termo_busca} em {localizacao if localizacao else 'qualquer lugar'}")
-
-        url = f"https://www.linkedin.com/search/results/people/?keywords={termo_busca.replace(' ', '%20')}"
-        if localizacao:
-            url += f"%20em%20{localizacao.replace(' ', '%20')}"
-        print(Fore.YELLOW + f"URL gerada: {url}")
-
         try:
+            if not self.is_logged_in:
+                if not self.verificar_login():
+                    if not self.fazer_login():
+                        raise Exception("Não foi possível fazer login. Verifique credenciais ou bloqueios do LinkedIn.")
+
+            self.termo_busca = termo_busca
+            self.localizacao = localizacao if localizacao else ""
+            print(f"Pesquisando: {termo_busca} em {localizacao if localizacao else 'qualquer lugar'}")
+
+            url = f"https://www.linkedin.com/search/results/people/?keywords={termo_busca.replace(' ', '%20')}"
+            if localizacao:
+                url += f"%20em%20{localizacao.replace(' ', '%20')}"
+            print(f"URL gerada: {url}")
+
             self.driver.get(url)
             self.wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+            time.sleep(3)  # Aguarda o carregamento completo
         except Exception as e:
-            print(Fore.RED + f"Erro ao carregar página de pesquisa: {e}")
+            print(f"Erro ao carregar página de pesquisa: {str(e)}")
+            raise
 
     def enviar_pedidos_conexao(self, mensagem, max_pages=10):
-        print(Fore.YELLOW + "Enviando pedidos de conexão...")
-        conexoes_enviadas = 0
-        pagina_atual = 1
+        try:
+            if not self.is_logged_in:
+                if not self.verificar_login():
+                    if not self.fazer_login():
+                        raise Exception("Não foi possível fazer login. Verifique credenciais ou bloqueios do LinkedIn.")
 
-        while pagina_atual <= max_pages:
-            print(Fore.CYAN + f"Visitando página {pagina_atual}")
-            url = f"https://www.linkedin.com/search/results/people/?keywords={self.termo_busca.replace(' ', '%20')}%20em%20{self.localizacao.replace(' ', '%20')}&page={pagina_atual}"
-            
-            try:
-                self.driver.get(url)
-                self.wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
-                time.sleep(3)  # Pequena pausa extra para garantir carregamento
-            except Exception as e:
-                print(Fore.RED + f"Erro ao carregar página {pagina_atual}: {e}")
-                break
+            print("Enviando pedidos de conexão...")
+            conexoes_enviadas = 0
+            pagina_atual = 1
 
-            try:
-                self.wait.until(EC.presence_of_element_located((By.XPATH, "//button[contains(@aria-label, 'se conectar')]")))
-            except TimeoutException:
-                print(Fore.YELLOW + "Nenhum botão encontrado rapidamente. Esperando mais tempo...")
-                time.sleep(3)
-
-            botoes_conectar = self.driver.find_elements(By.XPATH, "//button[contains(@aria-label, 'se conectar')]")
-            print(f"Total de botões de conectar na página {pagina_atual}: {len(botoes_conectar)}")
-
-            if not botoes_conectar:
-                print(Fore.YELLOW + "Nenhum botão de conectar encontrado nesta página. Indo para a próxima.")
-                pagina_atual += 1
-                continue
-
-            for botao in botoes_conectar:
+            while pagina_atual <= max_pages:
+                print(f"Visitando página {pagina_atual}")
+                url = f"https://www.linkedin.com/search/results/people/?keywords={self.termo_busca.replace(' ', '%20')}"
+                if self.localizacao:
+                    url += f"%20em%20{self.localizacao.replace(' ', '%20')}"
+                url += f"&page={pagina_atual}"
+                
                 try:
-                    botao.click()
-                    time.sleep(1)
-
-                    if self.conter_nota and mensagem:
-                        adicionar_nota = self.wait.until(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Adicionar nota')]")))
-                        adicionar_nota.click()
-                        campo_mensagem = self.wait.until(EC.presence_of_element_located((By.XPATH, "//textarea[@name='message']")))
-                        campo_mensagem.send_keys(mensagem)
-                        self.wait.until(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Enviar')]"))).click()
-                    else:
-                        self.wait.until(EC.presence_of_element_located((By.XPATH, "//button[contains(., 'Enviar sem nota')]"))).click()
-
-                    conexoes_enviadas += 1
-                    print(Fore.GREEN + f"Conexão enviada. Total: {conexoes_enviadas}")
-                    time.sleep(1)
+                    self.driver.get(url)
+                    self.wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+                    time.sleep(3)
                 except Exception as e:
-                    print(Fore.RED + f"Erro ao enviar pedido: {e}")
-            
-            pagina_atual += 1
-        print(Fore.CYAN + f"Total de conexões enviadas: {conexoes_enviadas}")
+                    print(f"Erro ao carregar página {pagina_atual}: {str(e)}")
+                    break
+
+                try:
+                    self.wait.until(EC.presence_of_element_located((By.XPATH, "//button[contains(@aria-label, 'se conectar')]")))
+                except TimeoutException:
+                    print("Nenhum botão encontrado rapidamente. Esperando mais tempo...")
+                    time.sleep(3)
+
+                botoes_conectar = self.driver.find_elements(By.XPATH, "//button[contains(@aria-label, 'se conectar')]")
+                print(f"Total de botões de conectar na página {pagina_atual}: {len(botoes_conectar)}")
+
+                if not botoes_conectar:
+                    print("Nenhum botão de conectar encontrado nesta página. Indo para a próxima.")
+                    pagina_atual += 1
+                    continue
+
+                for botao in botoes_conectar:
+                    try:
+                        botao.click()
+                        time.sleep(1)
+
+                        if self.conter_nota and mensagem:
+                            adicionar_nota = self.wait.until(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Adicionar nota')]")))
+                            adicionar_nota.click()
+                            campo_mensagem = self.wait.until(EC.presence_of_element_located((By.XPATH, "//textarea[@name='message']")))
+                            campo_mensagem.send_keys(mensagem)
+                            self.wait.until(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Enviar')]"))).click()
+                        else:
+                            self.wait.until(EC.presence_of_element_located((By.XPATH, "//button[contains(., 'Enviar sem nota')]"))).click()
+
+                        conexoes_enviadas += 1
+                        print(f"Conexão enviada. Total: {conexoes_enviadas}")
+                        time.sleep(1)
+                    except Exception as e:
+                        print(f"Erro ao enviar pedido: {str(e)}")
+                        continue
+                
+                pagina_atual += 1
+            print(f"Total de conexões enviadas: {conexoes_enviadas}")
+        except Exception as e:
+            print(f"Erro ao enviar pedidos de conexão: {str(e)}")
+            raise
 
     def fechar(self):
-        self.driver.quit()
+        try:
+            if self.driver:
+                self.driver.quit()
+                self.driver = None
+                self.wait = None
+                self.is_logged_in = False
+        except:
+            pass
 
 def mostrar_menu():
     titulo = pyfiglet.figlet_format("Linkedin Bot")

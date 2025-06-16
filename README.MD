@@ -12,11 +12,12 @@
 
 Este projeto é um **bot de automação para o LinkedIn**, que permite realizar login, pesquisar usuários de uma área específica e enviar solicitações de conexão personalizadas **automaticamente**. Agora, conta também com um **sistema de automação programada**, que executa as conexões toda **segunda-feira** e pode ser configurado para **iniciar automaticamente com o sistema**.
 
-
 ## 📋 Índice
 - [Requisitos](#️-requisitos)
 - [Instalação](#-instalação)
 - [Como usar](#️-como-usar)
+  - [Interface Gráfica](#interface-gráfica)
+  - [Linha de Comando](#linha-de-comando)
 - [Automação e Agendamento](#-automação-e-agendamento)
 - [Funcionalidades](#-funcionalidades)
 - [Estrutura do Projeto](#-estrutura-do-projeto)
@@ -63,34 +64,48 @@ Este projeto é um **bot de automação para o LinkedIn**, que permite realizar 
 
 ## 🕹️ **Como usar**
 
-1. **Execute o bot**:
+### Interface Gráfica
 
-   ```bash
-   python main.py
-   ```
+Para iniciar o bot com a interface gráfica, simplesmente execute:
 
-2. **Escolha uma opção no menu interativo**:
+```bash
+python main.py
+```
 
-   - **1**: **Ativar automação** (O bot rodará automaticamente toda segunda-feira)
-   - **2**: **Desativar automação** (O bot não será executado automaticamente)
-   - **3**: **Alterar parâmetros da automação** (termo de busca, localização, mensagem personalizada, número de páginas)
-   - **4**: **Iniciar manualmente** (Executa a automação imediatamente)
-   - **5**: **Sair**
+A interface gráfica oferece três abas principais:
+
+1. **Login**: Configure suas credenciais do LinkedIn
+2. **Busca**: Configure os parâmetros de busca e envio de conexões
+3. **Automação**: Ative ou desative a automação semanal
+
+### Linha de Comando
+
+Para usar o bot via linha de comando, execute:
+
+```bash
+python main.py --cli
+```
+
+O menu interativo oferece as seguintes opções:
+
+- **1**: Fazer login no LinkedIn
+- **2**: Pesquisar e enviar pedidos de conexão
+- **3**: Sair
 
 ## ⏰ **Automação e Agendamento**
 
-Agora, o bot pode **rodar automaticamente toda segunda-feira** para evitar bloqueios do LinkedIn devido ao limite semanal de conexões. O agendamento pode ser ativado ou desativado pelo próprio menu.
-
-Caso o sistema seja desligado e religado, a automação **ainda será executada na próxima segunda-feira**.
+O bot pode **rodar automaticamente toda segunda-feira** para evitar bloqueios do LinkedIn devido ao limite semanal de conexões. O agendamento pode ser ativado ou desativado tanto pela interface gráfica quanto pela linha de comando.
 
 ## 🌟 **Funcionalidades**
 
+✅ **Interface gráfica moderna e intuitiva**\
 ✅ **Login automático** (reutilização de sessão)\
 ✅ **Pesquisa personalizada** por usuários no LinkedIn\
 ✅ **Envio automático de conexões**, com ou sem mensagem personalizada\
 ✅ **Execução programada toda segunda-feira** para evitar bloqueios\
-✅ **Possibilidade de alterar os parâmetros de automação pelo menu**\
-✅ **Opção de iniciar automaticamente com o sistema**
+✅ **Possibilidade de alterar os parâmetros de automação**\
+✅ **Opção de iniciar automaticamente com o sistema**\
+✅ **Suporte a modo CLI para usuários avançados**
 
 ## 📂 **Estrutura do Projeto**
 
@@ -100,7 +115,8 @@ Caso o sistema seja desligado e religado, a automação **ainda será executada 
     ├── session/            # Dados de sessão (cookies) do LinkedIn
     ├── .env                # Credenciais do LinkedIn
     ├── .gitignore          # Arquivos ignorados pelo Git
-    ├── main.py             # Código principal do bot e menu interativo
+    ├── main.py             # Ponto de entrada do programa
+    ├── gui.py              # Interface gráfica
     ├── config_manager.py   # Sistema de automação e agendamentos
     ├── linkedin_bot.py     # Código principal do bot do LinkedIn
     ├── requirements.txt    # Dependências do projeto
