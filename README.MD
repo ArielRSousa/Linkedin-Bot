@@ -105,7 +105,7 @@ python install.py
 
 4. **Configure suas credenciais**:
    ```plaintext
-   # .env
+   # config/.env
    LINKEDIN_USERNAME=seu_email@exemplo.com
    LINKEDIN_PASSWORD=sua_senha_segura
    ```
@@ -116,12 +116,12 @@ python install.py
 
 1. **Inicie o programa**:
    ```bash
-   python main.py
+   python -m linkedin_bot
    ```
 
 2. **Configure o Login**:
    - Insira suas credenciais do LinkedIn
-   - Salve as configurações
+   - Salve as configurações (serão salvas em config/.env)
 
 3. **Configure a Busca**:
    - Defina os termos de busca
@@ -138,7 +138,7 @@ python install.py
 Para usuários avançados, o modo CLI oferece controle total:
 
 ```bash
-python main.py --cli
+python -m linkedin_bot --cli
 ```
 
 ## 📺 Vídeos Tutoriais
@@ -211,3 +211,29 @@ MIT License © 2024 - Ariel Sousa
 <div align="center">
   <sub>Desenvolvido com ❤️ por <a href="https://github.com/ArielRSousa">Ariel Sousa</a></sub>
 </div>
+
+## 📁 Estrutura de Pastas (Exemplo)
+
+```
+Linkedin-Bot/
+├── assets/
+│   └── logo.png
+├── chrome_profile/
+├── config/
+│   ├── .env
+│   ├── config.json
+│   └── version.json
+├── linkedin_bot/
+│   ├── __init__.py
+│   ├── __main__.py
+│   ├── main.py
+│   ├── gui.py
+│   ├── config_manager.py
+│   ├── linkedin_bot.py
+│   └── updater.py
+├── tests/
+├── requirements.txt
+├── LICENSE
+├── README.MD
+└── .gitignore
+```
