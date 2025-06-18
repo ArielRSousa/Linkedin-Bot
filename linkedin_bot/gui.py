@@ -120,23 +120,26 @@ class MainWindow(QMainWindow):
         # Configurar estilo
         self.setStyleSheet("""
             QMainWindow {
-                background-color: #f0f0f0;
+                background-color: #181818;
             }
             QGroupBox {
                 font-weight: bold;
-                border: 2px solid #cccccc;
+                border: 2px solid #333333;
                 border-radius: 6px;
                 margin-top: 6px;
                 padding-top: 10px;
+                color: #e0e0e0;
+                background-color: #232323;
             }
             QGroupBox::title {
                 subcontrol-origin: margin;
                 left: 7px;
                 padding: 0px 5px 0px 5px;
+                color: #00bfff;
             }
             QPushButton {
                 background-color: #0077b5;
-                color: white;
+                color: #fff;
                 border: none;
                 padding: 8px 16px;
                 border-radius: 4px;
@@ -146,20 +149,72 @@ class MainWindow(QMainWindow):
                 background-color: #005582;
             }
             QPushButton:disabled {
-                background-color: #cccccc;
+                background-color: #444444;
+                color: #888888;
             }
             QLineEdit, QTextEdit {
                 padding: 5px;
-                border: 1px solid #cccccc;
+                border: 1px solid #333333;
                 border-radius: 4px;
+                background-color: #222222;
+                color: #e0e0e0;
+                selection-background-color: #0077b5;
+                selection-color: #fff;
+            }
+            QCheckBox, QLabel, QSpinBox {
+                color: #e0e0e0;
+            }
+            QTabWidget::pane {
+                border: 1px solid #333333;
+                background: #181818;
+            }
+            QTabBar::tab {
+                background: #232323;
+                color: #e0e0e0;
+                padding: 8px 20px;
+                border-top-left-radius: 6px;
+                border-top-right-radius: 6px;
+            }
+            QTabBar::tab:selected {
+                background: #0077b5;
+                color: #fff;
             }
             QProgressBar {
-                border: 2px solid #cccccc;
+                border: 2px solid #333333;
                 border-radius: 5px;
                 text-align: center;
+                background: #232323;
+                color: #e0e0e0;
             }
             QProgressBar::chunk {
                 background-color: #0077b5;
+            }
+            QTextEdit {
+                background-color: #222222;
+                color: #e0e0e0;
+                border: 1px solid #333333;
+                border-radius: 4px;
+                padding: 5px;
+            }
+            QMenuBar {
+                background-color: #181818;
+                color: #e0e0e0;
+            }
+            QMenuBar::item:selected {
+                background: #232323;
+            }
+            QMenu {
+                background-color: #232323;
+                color: #e0e0e0;
+                border: 1px solid #333333;
+            }
+            QMenu::item:selected {
+                background-color: #0077b5;
+                color: #fff;
+            }
+            QStatusBar {
+                background: #181818;
+                color: #e0e0e0;
             }
         """)
         
@@ -295,8 +350,9 @@ class MainWindow(QMainWindow):
         self.log_area.setReadOnly(True)
         self.log_area.setStyleSheet("""
             QTextEdit {
-                background-color: #ffffff;
-                border: 1px solid #cccccc;
+                background-color: #222222;
+                color: #e0e0e0;
+                border: 1px solid #333333;
                 border-radius: 4px;
                 padding: 5px;
             }
