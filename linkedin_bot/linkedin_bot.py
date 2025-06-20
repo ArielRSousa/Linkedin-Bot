@@ -198,13 +198,23 @@ class LinkedinBot:
                     time.sleep(1)
 
                     if self.conter_nota and mensagem:
-                        adicionar_nota = self.wait.until(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Adicionar nota')]")))
+                        try:
+                            self.wait.until(EC.visibility_of_element_located((By.CLASS_NAME, "artdeco-modal__content")))
+                            adicionar_nota = self.wait.until(EC.element_to_be_clickable((By.XPATH, "//button[normalize-space()='Adicionar nota']")))
+                        except Exception:
+                            try:
+                                adicionar_nota = self.wait.until(EC.element_to_be_clickable((By.XPATH, "/html/body/div[4]/div/div/div[3]/button[1]")))
+                            except Exception:
+                                adicionar_nota = self.wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(@class, 'artdeco-modal__actionbar')]//button[not(contains(@class, 'artdeco-button--primary'))]")))
+                        
                         adicionar_nota.click()
+                        time.sleep(1)
+
                         campo_mensagem = self.wait.until(EC.presence_of_element_located((By.XPATH, "//textarea[@name='message']")))
                         campo_mensagem.send_keys(mensagem)
-                        self.wait.until(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Enviar')]"))).click()
+                        self.wait.until(EC.element_to_be_clickable((By.XPATH, "//button[normalize-space()='Enviar']"))).click()
                     else:
-                        self.wait.until(EC.presence_of_element_located((By.XPATH, "//button[contains(., 'Enviar sem nota')]"))).click()
+                        self.wait.until(EC.element_to_be_clickable((By.XPATH, "//button[normalize-space()='Enviar sem nota']"))).click()
 
                     conexoes_enviadas_pagina += 1
                     print(f"Conexão enviada. Total na página: {conexoes_enviadas_pagina}")
