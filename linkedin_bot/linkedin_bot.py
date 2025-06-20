@@ -156,69 +156,64 @@ class LinkedinBot:
             print(f"Erro ao carregar página de pesquisa: {str(e)}")
             raise
 
-    def enviar_pedidos_conexao(self, mensagem, max_pages=10):
+    def enviar_pedidos_conexao(self, mensagem, pagina_atual=1):
         try:
             if not self.is_logged_in:
                 if not self.verificar_login():
                     if not self.fazer_login():
                         raise Exception("Não foi possível fazer login. Verifique credenciais ou bloqueios do LinkedIn.")
 
-            print("Enviando pedidos de conexão...")
-            conexoes_enviadas = 0
-            pagina_atual = 1
+            print(f"Enviando pedidos de conexão na página {pagina_atual}...")
+            conexoes_enviadas_pagina = 0
 
-            while pagina_atual <= max_pages:
-                print(f"Visitando página {pagina_atual}")
-                url = f"https://www.linkedin.com/search/results/people/?keywords={self.termo_busca.replace(' ', '%20')}"
-                if self.localizacao:
-                    url += f"%20em%20{self.localizacao.replace(' ', '%20')}"
-                url += f"&page={pagina_atual}"
-                
+            url = f"https://www.linkedin.com/search/results/people/?keywords={self.termo_busca.replace(' ', '%20')}"
+            if self.localizacao:
+                url += f"%20em%20{self.localizacao.replace(' ', '%20')}"
+            url += f"&page={pagina_atual}"
+            
+            try:
+                self.driver.get(url)
+                self.wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+                time.sleep(3)
+            except Exception as e:
+                print(f"Erro ao carregar página {pagina_atual}: {str(e)}")
+                return 0
+
+            try:
+                self.wait.until(EC.presence_of_element_located((By.XPATH, "//button[contains(@aria-label, 'se conectar')]")))
+            except TimeoutException:
+                print("Nenhum botão encontrado rapidamente. Esperando mais tempo...")
+                time.sleep(3)
+
+            botoes_conectar = self.driver.find_elements(By.XPATH, "//button[contains(@aria-label, 'se conectar')]")
+            print(f"Total de botões de conectar na página {pagina_atual}: {len(botoes_conectar)}")
+
+            if not botoes_conectar:
+                print("Nenhum botão de conectar encontrado nesta página.")
+                return 0
+
+            for botao in botoes_conectar:
                 try:
-                    self.driver.get(url)
-                    self.wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
-                    time.sleep(3)
+                    botao.click()
+                    time.sleep(1)
+
+                    if self.conter_nota and mensagem:
+                        adicionar_nota = self.wait.until(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Adicionar nota')]")))
+                        adicionar_nota.click()
+                        campo_mensagem = self.wait.until(EC.presence_of_element_located((By.XPATH, "//textarea[@name='message']")))
+                        campo_mensagem.send_keys(mensagem)
+                        self.wait.until(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Enviar')]"))).click()
+                    else:
+                        self.wait.until(EC.presence_of_element_located((By.XPATH, "//button[contains(., 'Enviar sem nota')]"))).click()
+
+                    conexoes_enviadas_pagina += 1
+                    print(f"Conexão enviada. Total na página: {conexoes_enviadas_pagina}")
+                    time.sleep(1)
                 except Exception as e:
-                    print(f"Erro ao carregar página {pagina_atual}: {str(e)}")
-                    break
-
-                try:
-                    self.wait.until(EC.presence_of_element_located((By.XPATH, "//button[contains(@aria-label, 'se conectar')]")))
-                except TimeoutException:
-                    print("Nenhum botão encontrado rapidamente. Esperando mais tempo...")
-                    time.sleep(3)
-
-                botoes_conectar = self.driver.find_elements(By.XPATH, "//button[contains(@aria-label, 'se conectar')]")
-                print(f"Total de botões de conectar na página {pagina_atual}: {len(botoes_conectar)}")
-
-                if not botoes_conectar:
-                    print("Nenhum botão de conectar encontrado nesta página. Indo para a próxima.")
-                    pagina_atual += 1
+                    print(f"Erro ao enviar pedido: {str(e)}")
                     continue
-
-                for botao in botoes_conectar:
-                    try:
-                        botao.click()
-                        time.sleep(1)
-
-                        if self.conter_nota and mensagem:
-                            adicionar_nota = self.wait.until(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Adicionar nota')]")))
-                            adicionar_nota.click()
-                            campo_mensagem = self.wait.until(EC.presence_of_element_located((By.XPATH, "//textarea[@name='message']")))
-                            campo_mensagem.send_keys(mensagem)
-                            self.wait.until(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Enviar')]"))).click()
-                        else:
-                            self.wait.until(EC.presence_of_element_located((By.XPATH, "//button[contains(., 'Enviar sem nota')]"))).click()
-
-                        conexoes_enviadas += 1
-                        print(f"Conexão enviada. Total: {conexoes_enviadas}")
-                        time.sleep(1)
-                    except Exception as e:
-                        print(f"Erro ao enviar pedido: {str(e)}")
-                        continue
-                
-                pagina_atual += 1
-            print(f"Total de conexões enviadas: {conexoes_enviadas}")
+            
+            return conexoes_enviadas_pagina
         except Exception as e:
             print(f"Erro ao enviar pedidos de conexão: {str(e)}")
             raise
@@ -262,9 +257,9 @@ def main():
             termo_busca = input(Fore.CYAN + "Digite o termo de busca (ex.: Desenvolvedor de Software): ")
             localizacao = input(Fore.CYAN + "Digite a localização desejada ou pressione Enter para ignorar: ")
             mensagem_personalizada = input(Fore.CYAN + "Digite a mensagem personalizada ou pressione Enter para ignorar: ")
-            max_pages = int(input(Fore.CYAN + "Digite o número máximo de páginas para visitar: "))
-            bot.pesquisar_pessoas(termo_busca, localizacao if localizacao else None)
-            bot.enviar_pedidos_conexao(mensagem_personalizada if mensagem_personalizada else None, max_pages)
+            pagina_atual = int(input(Fore.CYAN + "Digite o número da página para enviar pedidos de conexão: "))
+            conexoes_enviadas = bot.enviar_pedidos_conexao(mensagem_personalizada if mensagem_personalizada else None, pagina_atual)
+            print(f"Total de conexões enviadas: {conexoes_enviadas}")
         elif opcao == "3":
             print(Fore.GREEN + "Encerrando o bot. Até a próxima!")
             bot.fechar()

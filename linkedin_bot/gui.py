@@ -57,7 +57,7 @@ class BotThread(QThread):
                     self.update_signal.emit(f"Erro de login: {str(e)}")
                     self.status_signal.emit("Erro de login")
                     return
-                conexoes_enviadas = 0
+                conexoes_enviadas_total = 0
                 pagina_atual = 1
                 max_pages = self.kwargs.get('max_pages', 10)
 
@@ -66,12 +66,13 @@ class BotThread(QThread):
                     self.update_signal.emit(f"Processando página {pagina_atual} de {max_pages}")
                     self.progress_signal.emit(int((pagina_atual / max_pages) * 100))
                     try:
-                        self.bot.enviar_pedidos_conexao(
+                        conexoes_nesta_pagina = self.bot.enviar_pedidos_conexao(
                             self.kwargs.get('mensagem'),
-                            1
+                            pagina_atual=pagina_atual
                         )
-                        conexoes_enviadas += 1
-                        self.update_signal.emit(f"Conexões enviadas nesta página: {conexoes_enviadas}")
+                        if conexoes_nesta_pagina > 0:
+                            self.update_signal.emit(f"Conexões enviadas nesta página: {conexoes_nesta_pagina}")
+                        conexoes_enviadas_total += conexoes_nesta_pagina
                     except WebDriverException as wde:
                         if not self.is_running:
                             self.update_signal.emit("A operação foi cancelada e a conexão com o navegador foi encerrada.")
@@ -87,7 +88,7 @@ class BotThread(QThread):
                     pagina_atual += 1
 
                 if self.is_running:
-                    self.update_signal.emit(f"Busca e envio de conexões concluídos! Total de conexões: {conexoes_enviadas}")
+                    self.update_signal.emit(f"Busca e envio de conexões concluídos! Total de conexões: {conexoes_enviadas_total}")
                     self.status_signal.emit("Operação concluída com sucesso")
                 else:
                     self.update_signal.emit("Operação cancelada pelo usuário.")
