@@ -1,0 +1,284 @@
+import undetected_chromedriver as uc
+import time
+import os
+import pyfiglet
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
+from dotenv import load_dotenv
+from colorama import Fore, Style, init
+
+init(autoreset=True)
+
+ENV_PATH = os.path.join("config", ".env")
+
+if not os.path.exists(ENV_PATH):
+    os.makedirs("config", exist_ok=True)
+    with open(ENV_PATH, "w") as f:
+        f.write("LINKEDIN_USERNAME=\n")
+        f.write("LINKEDIN_PASSWORD=\n")
+    print(Fore.YELLOW + "Arquivo .env criado em config/.env. Preencha com suas credenciais do LinkedIn.")
+
+load_dotenv(ENV_PATH)
+
+class LinkedinBot:
+    def __init__(self, username, password, conter_nota=False):
+        self.username = username
+        self.password = password
+        self.conter_nota = conter_nota
+        self.driver = None
+        self.wait = None
+        self.is_logged_in = False
+        self.iniciar_driver()
+
+    def iniciar_driver(self):
+        try:
+            # Só cria um novo driver se não existir
+            if self.driver:
+                return self.driver
+
+            options = uc.ChromeOptions()
+            options.add_argument('--no-sandbox')
+            options.add_argument('--disable-dev-shm-usage')
+            options.add_argument('--disable-gpu')
+            options.add_argument('--disable-extensions')
+            options.add_argument('--disable-popup-blocking')
+            options.add_argument('--start-maximized')
+            options.add_argument('--disable-notifications')
+            # Persistência de sessão
+            profile_path = os.path.join(os.getcwd(), "chrome_profile")
+            options.add_argument(f'--user-data-dir={profile_path}')
+            
+            self.driver = uc.Chrome(options=options)
+            self.wait = WebDriverWait(self.driver, 10)
+            return self.driver
+        except Exception as e:
+            print(f"Erro ao iniciar o driver: {str(e)}")
+            return None
+
+    def verificar_login(self):
+        try:
+            if not self.driver:
+                self.iniciar_driver()
+                if not self.driver:
+                    return False
+
+            self.driver.get("https://www.linkedin.com/feed")
+            time.sleep(3)
+
+            # Se está na página de login, não está logado
+            if "login" in self.driver.current_url:
+                self.is_logged_in = False
+                return False
+
+            # Se está no feed, provavelmente está logado
+            if "/feed" in self.driver.current_url:
+                self.is_logged_in = True
+                return True
+
+            # Verificação extra: procura por elementos do menu superior
+            try:
+                self.wait.until(EC.presence_of_element_located((By.XPATH, "//header")))
+                self.is_logged_in = True
+                return True
+            except:
+                self.is_logged_in = False
+                return False
+
+        except Exception as e:
+            print(f"Erro ao verificar login: {str(e)}")
+            self.is_logged_in = False
+            return False
+
+    def fazer_login(self):
+        try:
+            if self.is_logged_in:
+                print("Já está logado!")
+                return True
+
+            if not self.driver:
+                self.iniciar_driver()
+                if not self.driver:
+                    raise Exception("Não foi possível iniciar o driver")
+
+            self.driver.get("https://www.linkedin.com/login")
+            time.sleep(2)
+            
+            # Limpar campos antes de preencher
+            username_field = self.driver.find_element(By.ID, "username")
+            password_field = self.driver.find_element(By.ID, "password")
+            
+            username_field.clear()
+            password_field.clear()
+            
+            username_field.send_keys(self.username)
+            password_field.send_keys(self.password)
+            
+            submit_button = self.driver.find_element(By.XPATH, "//button[@type='submit']")
+            submit_button.click()
+            time.sleep(5)
+
+            # Verifica se o login foi bem sucedido
+            if self.verificar_login():
+                self.is_logged_in = True
+                print("Login realizado com sucesso!")
+                return True
+            else:
+                print("Falha no login. Verifique suas credenciais ou se há bloqueio/captcha.")
+                return False
+
+        except Exception as e:
+            print(f"Erro ao fazer login: {str(e)}")
+            self.is_logged_in = False
+            raise
+
+    def pesquisar_pessoas(self, termo_busca, localizacao=None):
+        try:
+            if not self.is_logged_in:
+                if not self.verificar_login():
+                    if not self.fazer_login():
+                        raise Exception("Não foi possível fazer login. Verifique credenciais ou bloqueios do LinkedIn.")
+
+            self.termo_busca = termo_busca
+            self.localizacao = localizacao if localizacao else ""
+            print(f"Pesquisando: {termo_busca} em {localizacao if localizacao else 'qualquer lugar'}")
+
+            url = f"https://www.linkedin.com/search/results/people/?keywords={termo_busca.replace(' ', '%20')}"
+            if localizacao:
+                url += f"%20em%20{localizacao.replace(' ', '%20')}"
+            print(f"URL gerada: {url}")
+
+            self.driver.get(url)
+            self.wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+            time.sleep(3)  # Aguarda o carregamento completo
+        except Exception as e:
+            print(f"Erro ao carregar página de pesquisa: {str(e)}")
+            raise
+
+    def enviar_pedidos_conexao(self, mensagem, pagina_atual=1):
+        try:
+            if not self.is_logged_in:
+                if not self.verificar_login():
+                    if not self.fazer_login():
+                        raise Exception("Não foi possível fazer login. Verifique credenciais ou bloqueios do LinkedIn.")
+
+            print(f"Enviando pedidos de conexão na página {pagina_atual}...")
+            conexoes_enviadas_pagina = 0
+
+            url = f"https://www.linkedin.com/search/results/people/?keywords={self.termo_busca.replace(' ', '%20')}"
+            if self.localizacao:
+                url += f"%20em%20{self.localizacao.replace(' ', '%20')}"
+            url += f"&page={pagina_atual}"
+            
+            try:
+                self.driver.get(url)
+                self.wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+                time.sleep(3)
+            except Exception as e:
+                print(f"Erro ao carregar página {pagina_atual}: {str(e)}")
+                return 0
+
+            try:
+                self.wait.until(EC.presence_of_element_located((By.XPATH, "//button[contains(@aria-label, 'se conectar')]")))
+            except TimeoutException:
+                print("Nenhum botão encontrado rapidamente. Esperando mais tempo...")
+                time.sleep(3)
+
+            botoes_conectar = self.driver.find_elements(By.XPATH, "//button[contains(@aria-label, 'se conectar')]")
+            print(f"Total de botões de conectar na página {pagina_atual}: {len(botoes_conectar)}")
+
+            if not botoes_conectar:
+                print("Nenhum botão de conectar encontrado nesta página.")
+                return 0
+
+            for botao in botoes_conectar:
+                try:
+                    botao.click()
+                    time.sleep(1)
+
+                    if self.conter_nota and mensagem:
+                        try:
+                            self.wait.until(EC.visibility_of_element_located((By.CLASS_NAME, "artdeco-modal__content")))
+                            adicionar_nota = self.wait.until(EC.element_to_be_clickable((By.XPATH, "//button[normalize-space()='Adicionar nota']")))
+                        except Exception:
+                            try:
+                                adicionar_nota = self.wait.until(EC.element_to_be_clickable((By.XPATH, "/html/body/div[4]/div/div/div[3]/button[1]")))
+                            except Exception:
+                                adicionar_nota = self.wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(@class, 'artdeco-modal__actionbar')]//button[not(contains(@class, 'artdeco-button--primary'))]")))
+                        
+                        adicionar_nota.click()
+                        time.sleep(1)
+
+                        campo_mensagem = self.wait.until(EC.presence_of_element_located((By.XPATH, "//textarea[@name='message']")))
+                        campo_mensagem.send_keys(mensagem)
+                        self.wait.until(EC.element_to_be_clickable((By.XPATH, "//button[normalize-space()='Enviar']"))).click()
+                    else:
+                        self.wait.until(EC.element_to_be_clickable((By.XPATH, "//button[normalize-space()='Enviar sem nota']"))).click()
+
+                    conexoes_enviadas_pagina += 1
+                    print(f"Conexão enviada. Total na página: {conexoes_enviadas_pagina}")
+                    time.sleep(1)
+                except Exception as e:
+                    print(f"Erro ao enviar pedido: {str(e)}")
+                    continue
+            
+            return conexoes_enviadas_pagina
+        except Exception as e:
+            print(f"Erro ao enviar pedidos de conexão: {str(e)}")
+            raise
+
+    def fechar(self):
+        try:
+            if self.driver:
+                self.driver.quit()
+                self.driver = None
+                self.wait = None
+                self.is_logged_in = False
+        except:
+            pass
+
+def mostrar_menu():
+    titulo = pyfiglet.figlet_format("Linkedin Bot")
+    print(Fore.BLUE + titulo)
+    print(Style.BRIGHT + Fore.YELLOW + "Criado por: @ArielRSousa\n")
+    print(Style.BRIGHT + Fore.YELLOW + "Automatize suas conexões no LinkedIn rapidamente.\n")
+    print(Fore.CYAN + "Escolha uma opção:")
+    print("1. Login no LinkedIn")
+    print("2. Pesquisar e enviar pedidos de conexão")
+    print("3. Sair\n")
+
+def main():
+    username = os.getenv("LINKEDIN_USERNAME")
+    password = os.getenv("LINKEDIN_PASSWORD")
+    bot = LinkedinBot(username, password)
+
+    while True:
+        mostrar_menu()
+        opcao = input(Fore.YELLOW + "Digite a opção desejada: ")
+
+        if opcao == "1":
+            if not bot.verificar_login():
+                bot.fazer_login()
+        elif opcao == "2":
+            if not bot.verificar_login():
+                print(Fore.RED + "Você precisa fazer login antes de continuar.")
+                continue
+            termo_busca = input(Fore.CYAN + "Digite o termo de busca (ex.: Desenvolvedor de Software): ")
+            localizacao = input(Fore.CYAN + "Digite a localização desejada ou pressione Enter para ignorar: ")
+            mensagem_personalizada = input(Fore.CYAN + "Digite a mensagem personalizada ou pressione Enter para ignorar: ")
+            pagina_atual = int(input(Fore.CYAN + "Digite o número da página para enviar pedidos de conexão: "))
+            conexoes_enviadas = bot.enviar_pedidos_conexao(mensagem_personalizada if mensagem_personalizada else None, pagina_atual)
+            print(f"Total de conexões enviadas: {conexoes_enviadas}")
+        elif opcao == "3":
+            print(Fore.GREEN + "Encerrando o bot. Até a próxima!")
+            bot.fechar()
+            break
+        else:
+            print(Fore.RED + "Opção inválida. Tente novamente.\n")
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        print(Fore.RED + "\nBot interrompido pelo usuário. Até a próxima!")

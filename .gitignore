@@ -16,3 +16,6 @@ __pycache__/
 # Ignora arquivos de sistema
 .DS_Store
 Thumbs.db
+
+# Ignora o perfil do Chrome
+chrome_profile/

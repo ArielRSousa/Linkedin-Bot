@@ -1,153 +1,239 @@
-# Linkedin Bot - Automatizador de Conexões no LinkedIn
+# LinkedIn Bot - Automatizador Inteligente de Conexões
 
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Automation-orange)](https://www.linkedin.com/)
-[![Status](https://img.shields.io/badge/Status-Active-brightgreen)](https://github.com/seuusuario/linkedin-bot)
+[![Status](https://img.shields.io/badge/Status-Active-brightgreen)](https://github.com/ArielRSousa/Linkedin-Bot)
 [![Chrome](https://img.shields.io/badge/Chrome-Required-red)](https://www.google.com/chrome/)
+[![Versão](https://img.shields.io/badge/Versão-1.0.0-blue)](https://github.com/ArielRSousa/Linkedin-Bot/releases)
 
-[![LinkedIn Bot](https://img.shields.io/badge/LinkedIn%20Bot-Automation%20Tool-yellow)](https://github.com/seuusuario/linkedin-bot)
-[![Automation](https://img.shields.io/badge/Automation-Scheduled-blueviolet)](https://github.com/seuusuario/linkedin-bot)
-[![Security](https://img.shields.io/badge/Security-Safe-brightgreen)](https://github.com/seuusuario/linkedin-bot)
+<div align="center">
+  <img src="assets/logo.png" alt="LinkedIn Bot Logo" width="300"/>
+  
+  *Automatize suas conexões no LinkedIn de forma inteligente e segura*
+</div>
 
-Este projeto é um **bot de automação para o LinkedIn**, que permite realizar login, pesquisar usuários de uma área específica e enviar solicitações de conexão personalizadas **automaticamente**. Agora, conta também com um **sistema de automação programada**, que executa as conexões toda **segunda-feira** e pode ser configurado para **iniciar automaticamente com o sistema**.
+## 🎯 Visão Geral
 
+O LinkedIn Bot é uma ferramenta de automação profissional que permite expandir sua rede no LinkedIn de forma inteligente e eficiente. Com uma interface moderna e recursos avançados, o bot ajuda você a:
+
+- 🔍 Encontrar profissionais relevantes para sua área
+- 🤝 Enviar solicitações de conexão personalizadas
+- ⏰ Programar conexões automáticas
+- 📊 Gerenciar sua rede de forma eficiente
 
 ## 📋 Índice
+- [Demonstração](#-demonstração)
+- [Características](#-características)
 - [Requisitos](#️-requisitos)
 - [Instalação](#-instalação)
-- [Como usar](#️-como-usar)
-- [Automação e Agendamento](#-automação-e-agendamento)
-- [Funcionalidades](#-funcionalidades)
-- [Estrutura do Projeto](#-estrutura-do-projeto)
+- [Como Usar](#️-como-usar)
+  - [Interface Gráfica](#interface-gráfica)
+  - [Linha de Comando](#linha-de-comando)
+- [Vídeos Tutoriais](#-vídeos-tutoriais)
+- [Automação](#-automação)
 - [Segurança](#-segurança)
+- [FAQ](#-faq)
 - [Contribuindo](#-contribuindo)
-- [Aviso](#️-aviso)
 - [Licença](#-licença)
 
-## 🛠️ **Requisitos**
+## 🎥 Demonstração
 
-- **Python 3.8+**
-- Ambiente virtual configurado (recomendado)
-- **Google Chrome** instalado
-- **Chromedriver** gerenciado automaticamente pelo `undetected-chromedriver`
+*Vídeos tutoriais em breve!*
 
-## 🔦 **Instalação**
+## ✨ Características
+
+### 🎨 Interface Moderna
+- Design intuitivo e responsivo
+- Navegação simplificada
+- Feedback visual em tempo real
+
+### 🤖 Automação Inteligente
+- Agendamento semanal automático
+- Detecção de limites do LinkedIn
+- Pausas inteligentes entre ações
+
+### 🔒 Segurança Avançada
+- Armazenamento seguro de credenciais
+- Proteção contra detecção
+- Respeito aos limites do LinkedIn
+
+### 📊 Personalização
+- Filtros de busca avançados
+- Mensagens personalizadas
+- Configurações flexíveis
+
+## 🛠️ Requisitos
+
+- **Sistema Operacional**: Windows 10+, macOS 10.15+, Linux
+- **Python**: Versão 3.8 ou superior
+- **Navegador**: Google Chrome (última versão)
+- **Memória**: Mínimo 4GB RAM
+- **Espaço em Disco**: 500MB livres
+
+## 🔧 Instalação
+
+### Método 1: Instalação Rápida (Recomendado)
+
+```bash
+# Clone o repositório
+git clone https://github.com/ArielRSousa/Linkedin-Bot.git
+cd Linkedin-Bot
+
+# Execute o script de instalação
+python install.py
+```
+
+### Método 2: Instalação Manual
 
 1. **Clone o repositório**:
-
    ```bash
-   git clone https://github.com/seuusuario/linkedin-bot.git
-   cd linkedin-bot
+   git clone https://github.com/ArielRSousa/Linkedin-Bot.git
+   cd Linkedin-Bot
    ```
 
-2. **Crie e ative o ambiente virtual**:
-
+2. **Configure o ambiente virtual**:
    ```bash
    python3 -m venv .venv
-   source .venv/bin/activate  # No Windows: .venv\Scripts\activate
+   source .venv/bin/activate  # Windows: .venv\Scripts\activate
    ```
 
 3. **Instale as dependências**:
-
    ```bash
    pip install -r requirements.txt
    ```
 
-4. **Crie o arquivo `.env` com suas credenciais**:
-
+4. **Configure suas credenciais**:
    ```plaintext
+   # config/.env
    LINKEDIN_USERNAME=seu_email@exemplo.com
    LINKEDIN_PASSWORD=sua_senha_segura
    ```
 
-## 🕹️ **Como usar**
+## 🕹️ Como Usar
 
-1. **Execute o bot**:
+### Interface Gráfica
 
+1. **Inicie o programa**:
    ```bash
-   python main.py
+   python -m linkedin_bot
    ```
 
-2. **Escolha uma opção no menu interativo**:
+2. **Configure o Login**:
+   - Insira suas credenciais do LinkedIn
+   - Salve as configurações (serão salvas em config/.env)
 
-   - **1**: **Ativar automação** (O bot rodará automaticamente toda segunda-feira)
-   - **2**: **Desativar automação** (O bot não será executado automaticamente)
-   - **3**: **Alterar parâmetros da automação** (termo de busca, localização, mensagem personalizada, número de páginas)
-   - **4**: **Iniciar manualmente** (Executa a automação imediatamente)
-   - **5**: **Sair**
+3. **Configure a Busca**:
+   - Defina os termos de busca
+   - Ajuste os filtros
+   - Personalize as mensagens
 
-## ⏰ **Automação e Agendamento**
+4. **Gerencie a Automação**:
+   - Ative/desative o agendamento
+   - Configure os parâmetros
+   - Monitore o progresso
 
-Agora, o bot pode **rodar automaticamente toda segunda-feira** para evitar bloqueios do LinkedIn devido ao limite semanal de conexões. O agendamento pode ser ativado ou desativado pelo próprio menu.
+### Linha de Comando
 
-Caso o sistema seja desligado e religado, a automação **ainda será executada na próxima segunda-feira**.
+Para usuários avançados, o modo CLI oferece controle total:
 
-## 🌟 **Funcionalidades**
-
-✅ **Login automático** (reutilização de sessão)\
-✅ **Pesquisa personalizada** por usuários no LinkedIn\
-✅ **Envio automático de conexões**, com ou sem mensagem personalizada\
-✅ **Execução programada toda segunda-feira** para evitar bloqueios\
-✅ **Possibilidade de alterar os parâmetros de automação pelo menu**\
-✅ **Opção de iniciar automaticamente com o sistema**
-
-## 📂 **Estrutura do Projeto**
-
-```
-/linkedin-bot
-    ├── .venv/              # Ambiente virtual
-    ├── session/            # Dados de sessão (cookies) do LinkedIn
-    ├── .env                # Credenciais do LinkedIn
-    ├── .gitignore          # Arquivos ignorados pelo Git
-    ├── main.py             # Código principal do bot e menu interativo
-    ├── config_manager.py   # Sistema de automação e agendamentos
-    ├── linkedin_bot.py     # Código principal do bot do LinkedIn
-    ├── requirements.txt    # Dependências do projeto
-    └── README.md           # Documentação
+```bash
+python -m linkedin_bot --cli
 ```
 
-## 🔒 **Segurança**
+## 📺 Vídeos Tutoriais
 
-- As credenciais do LinkedIn estão armazenadas no arquivo `.env`, que **não deve ser compartilhado**.
-- O projeto **não armazena** suas credenciais de forma insegura.
-- O uso excessivo do bot pode resultar em restrições da conta do LinkedIn.
+*Em breve!*
 
-## 🤝 **Contribuindo**
+- 📹 Instalação e Configuração
+- 📹 Uso da Interface Gráfica
+- 📹 Configuração da Automação
+- 📹 Dicas e Boas Práticas
 
-Contribuições são sempre bem-vindas! Se você tem alguma ideia para melhorar o projeto, sinta-se à vontade para:
+## ⏰ Automação
 
-1. Fazer um fork do projeto
-2. Criar uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'feat: add some amazing feature'`)
+O bot oferece um sistema de automação inteligente que:
+
+- 🔄 Executa automaticamente toda segunda-feira
+- ⚡ Respeita os limites do LinkedIn
+- 🎯 Foca em conexões relevantes
+- 📊 Gera relatórios de progresso
+
+## 🔒 Segurança
+
+- 🔐 Credenciais armazenadas localmente
+- 🔒 Comunicação criptografada
+- ⚠️ Respeito aos limites do LinkedIn
+- 📝 Logs detalhados de atividades
+
+## ❓ FAQ
+
+### Perguntas Frequentes
+
+1. **O bot é seguro?**
+   - Sim, todas as credenciais são armazenadas localmente
+   - O código é open-source e auditável
+
+2. **Posso ser bloqueado?**
+   - O bot respeita os limites do LinkedIn
+   - Recomendamos uso moderado
+
+3. **Como atualizar?**
+   - O bot verifica atualizações automaticamente
+   - Notificações são exibidas quando disponíveis
+
+## 🤝 Contribuindo
+
+Contribuições são bem-vindas! Siga estas etapas:
+
+1. Fork o projeto
+2. Crie sua branch (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'feat: add amazing feature'`)
 4. Push para a branch (`git push origin feature/AmazingFeature`)
-5. Abrir um Pull Request
+5. Abra um Pull Request
 
 ### 📝 Padrões de Commit
 
-Este projeto segue o padrão [Conventional Commits](https://www.conventionalcommits.org/). Por favor, use os seguintes prefixos nos seus commits:
+- `feat:` Novas funcionalidades
+- `fix:` Correções de bugs
+- `docs:` Documentação
+- `style:` Formatação
+- `refactor:` Refatoração
+- `test:` Testes
+- `chore:` Configurações
 
-- `feat:` para novas funcionalidades
-- `fix:` para correções de bugs
-- `docs:` para alterações na documentação
-- `style:` para alterações de formatação
-- `refactor:` para refatorações de código
-- `test:` para adição ou modificação de testes
-- `chore:` para atualizações de dependências ou configurações
+## 📄 Licença
 
-### 🐛 Reportando Bugs
+MIT License © 2024 - Ariel Sousa
 
-Se você encontrar algum bug, por favor, abra uma issue com:
-- Descrição detalhada do problema
-- Passos para reproduzir
-- Comportamento esperado
-- Screenshots (se aplicável)
-- Ambiente (sistema operacional, versão do Python, etc.)
+---
 
-## ⚠️ **Aviso**
+<div align="center">
+  <sub>Desenvolvido com ❤️ por <a href="https://github.com/ArielRSousa">Ariel Sousa</a></sub>
+</div>
 
-Este projeto foi desenvolvido **para fins educacionais**. O uso abusivo pode violar os **termos de serviço do LinkedIn**, resultando no bloqueio da sua conta. Use com responsabilidade.
+## 📁 Estrutura de Pastas (Exemplo)
 
-## 🐜 **Licença**
-
-MIT License © 2025 - Ariel Sousa
+```
+Linkedin-Bot/
+├── assets/
+│   └── logo.png
+├── chrome_profile/
+├── config/
+│   ├── .env
+│   ├── config.json
+│   └── version.json
+├── linkedin_bot/
+│   ├── __init__.py
+│   ├── __main__.py
+│   ├── main.py
+│   ├── gui.py
+│   ├── config_manager.py
+│   ├── linkedin_bot.py
+│   └── updater.py
+├── tests/
+├── requirements.txt
+├── LICENSE
+├── README.MD
+└── .gitignore
+```
